@@ -1,109 +1,186 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PC Virtual</title>
 <style>
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  background: #10131c;
-  color: white;
   font-family: Arial, sans-serif;
-}
-header {
-  background: #1c2232;
-  padding: 20px;
-  text-align: center;
-  font-size: 25px;
-  font-weight: bold;
-}
-main {
-  max-width: 900px;
-  margin: 25px auto;
-  padding: 15px;
-}
-.card {
-  background: #1c2232;
-  padding: 20px;
-  margin-bottom: 15px;
-  border-radius: 12px;
-}
-h2 { color: #48a9ff; }
-button {
-  background: #1683ee;
+  background: #101827;
   color: white;
-  border: none;
-  padding: 13px 20px;
-  border-radius: 8px;
-  font-size: 16px;
+}
+#boot {
+  position: fixed;
+  inset: 0;
+  background: #080d18;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+button {
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 5px;
+  background: #1769d2;
+  color: white;
   cursor: pointer;
   margin: 5px;
 }
-button:hover { background: #0864bd; }
-#screen {
-  background: #080b10;
-  border: 2px solid #39465e;
-  border-radius: 10px;
-  padding: 25px;
-  min-height: 250px;
-  text-align: center;
+#desktop {
+  display: none;
+  min-height: 100vh;
+  padding: 20px;
+  padding-bottom: 75px;
+  background: linear-gradient(135deg,#10254b,#176b9e);
 }
-.status { color: #4bdb8b; }
+.icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.app {
+  width: 100px;
+  padding: 15px 5px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.app:hover { background: #ffffff25; }
+.app-icon {
+  width: 45px;
+  height: 45px;
+  border: 2px solid white;
+  border-radius: 6px;
+  margin: 0 auto 10px;
+}
+#window {
+  display: none;
+  position: fixed;
+  top: 15%;
+  left: 5%;
+  width: 90%;
+  max-width: 600px;
+  background: white;
+  color: #111827;
+  border-radius: 8px;
+  overflow: hidden;
+}
+#titlebar {
+  background: #182b4a;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#content { padding: 20px; min-height: 200px; }
+textarea { width: 100%; height: 160px; }
+#taskbar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55px;
+  background: #101827;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+}
 </style>
 </head>
 <body>
-<header>🖥️ MEU PC VIRTUAL</header>
-<main>
-  <div class="card">
-    <h2>Configuração do PC</h2>
-    <p>💻 Processador: Intel Core i9</p>
-    <p>🎮 Placa de vídeo: Gráficos virtuais</p>
-    <p>⚡ Memória RAM: 64 GB (simulada)</p>
-    <p>💾 Armazenamento: 2 TB (simulado)</p>
-    <p>🪟 Sistema: Windows simulado</p>
-    <p class="status" id="status">● Desligado</p>
-    <button onclick="ligar()">Ligar PC</button>
-    <button onclick="desligar()">Desligar PC</button>
-  </div>
+<div id="boot">
+  <h1>PC VIRTUAL</h1>
+  <p>Computador virtual</p>
+  <button onclick="startPC()">LIGAR PC</button>
+</div>
 
-  <div class="card">
-    <h2>Área de trabalho</h2>
-    <div id="screen">
-      <h2>🪟 Windows Virtual</h2>
-      <p id="mensagem">Seu PC está desligado.</p>
-      <button onclick="abrirApp('Bloco de Notas')">📝 Bloco de Notas</button>
-      <button onclick="abrirApp('Navegador')">🌐 Navegador</button>
-      <button onclick="abrirApp('Explorador')">📁 Arquivos</button>
+<div id="desktop">
+  <h2>Área de trabalho</h2>
+  <div class="icons">
+    <div class="app" onclick="openApp('Bloco de Notas')">
+      <div class="app-icon"></div>
+      Bloco de Notas
+    </div>
+    <div class="app" onclick="openApp('Navegador')">
+      <div class="app-icon"></div>
+      Navegador
+    </div>
+    <div class="app" onclick="openApp('Arquivos')">
+      <div class="app-icon"></div>
+      Arquivos
+    </div>
+    <div class="app" onclick="openApp('Configurações')">
+      <div class="app-icon"></div>
+      Configurações
+    </div>
+    <div class="app" onclick="openApp('Sobre o PC')">
+      <div class="app-icon"></div>
+      Sobre o PC
     </div>
   </div>
-</main>
+</div>
+
+<div id="window">
+  <div id="titlebar">
+    <span id="appTitle">Aplicativo</span>
+    <button onclick="closeApp()">Fechar</button>
+  </div>
+  <div id="content"></div>
+</div>
+
+<div id="taskbar">
+  <button onclick="showDesktop()">Iniciar</button>
+  <span id="clock">PC Virtual</span>
+  <button onclick="shutdown()">Desligar</button>
+</div>
+
 <script>
-let ligado = false;
-
-function ligar() {
-  ligado = true;
-  document.getElementById("status").textContent = "● Ligado";
-  document.getElementById("mensagem").textContent =
-    "Bem-vindo ao seu PC virtual!";
+function startPC() {
+  document.getElementById('boot').style.display = 'none';
+  document.getElementById('desktop').style.display = 'block';
+  document.getElementById('taskbar').style.display = 'flex';
+  updateClock();
 }
-
-function desligar() {
-  ligado = false;
-  document.getElementById("status").textContent = "● Desligado";
-  document.getElementById("mensagem").textContent =
-    "Seu PC está desligado.";
+function shutdown() {
+  document.getElementById('desktop').style.display = 'none';
+  document.getElementById('window').style.display = 'none';
+  document.getElementById('taskbar').style.display = 'none';
+  document.getElementById('boot').style.display = 'flex';
 }
-
-function abrirApp(nome) {
-  if (!ligado) {
-    alert("Ligue o PC primeiro!");
-    return;
+function showDesktop() {
+  document.getElementById('window').style.display = 'none';
+}
+function openApp(name) {
+  const content = document.getElementById('content');
+  document.getElementById('appTitle').textContent = name;
+  if (name === 'Bloco de Notas') {
+    content.innerHTML = '<textarea placeholder="Digite seu texto"></textarea>';
+  } else if (name === 'Navegador') {
+    content.innerHTML = '<h3>Navegador virtual</h3><p>Simulação de navegador.</p>';
+  } else if (name === 'Arquivos') {
+    content.innerHTML = '<h3>Meus arquivos</h3><p>Nenhum arquivo disponível.</p>';
+  } else if (name === 'Configurações') {
+    content.innerHTML = '<h3>Configurações</h3><p>Sistema: PC Virtual</p>';
+  } else {
+    content.innerHTML = '<h3>Informações do PC</h3><p>Processador: Intel Core i9 (simulado)</p><p>Memória RAM: 64 GB (simulada)</p><p>Armazenamento: 2 TB (simulado)</p>';
   }
-  document.getElementById("mensagem").textContent =
-    nome + " aberto no PC virtual.";
+  document.getElementById('window').style.display = 'block';
 }
+function closeApp() {
+  document.getElementById('window').style.display = 'none';
+}
+function updateClock() {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('pt-BR');
+}
+setInterval(updateClock, 1000);
 </script>
 </body>
 </html>
